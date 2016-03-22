@@ -1,0 +1,60 @@
+Проект на GIT
+!!!!!!!!!!
+Заметки для переноса проекта
+1 - Проверить что папка "assets" имеет права 775 
+2 - Дамп БД находидся в файле yod.sql
+3 - Изменить данные для подключения к БД в файле /config/db.php
+
+
+Задание: Сгенерировать и записать в БД 2000 пользователей
+Запустить скрипт BASE_URL/createuser
+
+В моем случае хостинг ограничивает кол-во используемой памяти  php_memory_limit:64 mb,
+если кол-во создаваемых пользователей будет 2000 то сервер отдает ошибку PHP Fatal Error Allowed memory size
+Сейчас в скрипте за одно выполнение происходит добавление 1000 пользователей
+Есть вариант реализации создания 2000 пользователей, придется использовать крон...
+
+
+
+Написать класс для работы с пользователями со следующей функциональностью:
+Задание 1: зная ID пользователя получаем его имя, год рождения и список телефонных номеров
+Запустить скрипт BASE_URL/createuser/getuserid
+
+Задание 2: возможность пополнить любой из номеров на сумму до 100грн. максимум за одно пополнение
+Запустить скрипт BASE_URL/createuser/addfunds
+
+Задание 3: возможность добавить нового пользователя
+Запустить скрипт BASE_URL/createuser/adduser
+
+Задание 4: возможность добавить для пользователя номер мобильного телефона
+Запустить скрипт BASE_URL/createuser/addphoneuser
+
+Задание 5: возможность удалить всю информацию о пользователе вместе с номерами телефонов
+Запустить скрипт BASE_URL/createuser/deluser
+
+
+SQL запросы
+1:
+SELECT SUM( `balance` ) 
+FROM `phone_user`
+
+2:
+SELECT code, COUNT( code ) AS count
+FROM (
+SELECT SUBSTRING( phone, 4, 2 ) AS code
+FROM phone_user
+) AS t
+GROUP BY code
+
+3:
+SELECT `users`.`name` , COUNT( `phone_user`.`id` ) AS `count_phone_user` 
+FROM `users` 
+LEFT JOIN `phone_user` ON `users`.`id` = `phone_user`.`user_id` 
+GROUP BY `users`.`id` 
+
+4:
+SELECT `users`.`name` , `phone_user`.`balance` 
+FROM `users` 
+LEFT JOIN `phone_user` ON `users`.`id` = `phone_user`.`user_id` 
+ORDER BY `phone_user`.`balance` DESC 
+LIMIT 10
